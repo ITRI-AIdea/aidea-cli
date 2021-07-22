@@ -23,6 +23,7 @@ from typing import Optional, Tuple
 from tqdm.auto import tqdm
 from requests import get, post
 from texttable import Texttable
+from requests_toolbelt import MultipartEncoder
 
 
 WEBSITE_URL = 'https://aidea-web.tw'
@@ -200,16 +201,35 @@ def submit_result(*args, **kwargs) -> None:
         print(f'Your file "{file_path}" does not exist. Please check again!')
         sys.exit(0)
 
-    files = {
-        'submission': open(local_file_path, 'rb')
-    }
     url = f'{API_SERVER_BASE_URL}/topics/submission/{topic_id}'
     try:
-        result = post(
-            headers=_get_customized_header(),
-            url=url,
-            files=files,
-        )
+        if str(local_file_path).lower().endswith('zip'):
+            m = MultipartEncoder(
+                fields={
+                    'submission': (local_file_path.name, open(local_file_path, 'rb'), 'application/zip')
+                }
+            )
+            headers = _get_customized_header()
+            headers.update(
+                {
+                    'Content-Type': m.content_type,
+                    'Content-Disposition': 'form-data'
+                 }
+            )
+            result = post(
+                headers=headers,
+                url=url,
+                data=m,
+            )
+        else:
+            files = {
+                'submission': open(local_file_path, 'rb')
+            }
+            result = post(
+                headers=_get_customized_header(),
+                url=url,
+                files=files,
+            )
     except Exception as e:
         print(e)
 
