@@ -28,7 +28,7 @@ from requests_toolbelt import MultipartEncoder
 
 WEBSITE_URL = 'https://aidea-web.tw'
 API_SERVER_BASE_URL = f'{WEBSITE_URL}/api/v1'
-CONFIG_FOLDER = '.aidea'
+CONFIG_FOLDER = '.config/aidea'
 CONFIG_FILENAME = 'config.txt'
 
 
